@@ -20,6 +20,10 @@
 
 <label for="midi-input">MIDI Input:</label>
 <select id="midi-input"></select>
+
+<label for="midi-output">MIDI Output:</label>
+<select id="midi-output"></select>
+
   
 <button class="pitch" onclick="togglePitch(this)">C</button>
 <button class="pitch" onclick="togglePitch(this)">C#/Db</button>  
@@ -53,18 +57,19 @@ WebMidi.enable(function(err) {
     console.log("WebMidi could not be enabled.", err);
     return;
   }
-  
-  var select = document.getElementById("midi-input");
+
+  // INPUT
+  var selectInput = document.getElementById("midi-input");
 
   for (var i = 0; i < WebMidi.inputs.length; i++) {
     var opt = document.createElement("option");
     opt.value = i;
     opt.text = WebMidi.inputs[i].name;
-    select.appendChild(opt);
+    selectInput.appendChild(opt);
   }
 
-  select.addEventListener("change", function() {
-    var input = WebMidi.inputs[Number(select.value)];
+  selectInput.addEventListener("change", function() {
+    var input = WebMidi.inputs[Number(selectInput.value)];
 
     input.removeListener('noteon', "all");
 
@@ -73,8 +78,34 @@ WebMidi.enable(function(err) {
     });
   });
   
-  select.dispatchEvent(new Event("change"));
+  selectInput.dispatchEvent(new Event("change"));
+
+  // OUTPUT
+  var selectOutput = document.getElementById("midi-output");
+
+  for (var i = 0; i < WebMidi.outputs.length; i++) {
+    var opt = document.createElement("option");
+    opt.value = i;
+    opt.text = WebMidi.outputs[i].name;
+    selectOutput.appendChild(opt);
+  }
 });
+
+function onMidiEvent(event, input) {
+  var note = event.note.number;
+  var nearestPitch = findNearestPitch(note);
+
+  var selectOutput = document.getElementById("midi-output");
+  var output = WebMidi.outputs[Number(selectOutput.value)];
+
+  playMidiNote(nearestPitch, input, output);
+}
+
+// Rest of your code...
+
+function playMidiNote(pitch, input, output) {
+  output.playNote(pitch, input.channel);  // Same channel as the input.
+}
 
 function onMidiEvent(event, input) {
   var note = event.note.number;
