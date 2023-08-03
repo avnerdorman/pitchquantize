@@ -1,4 +1,4 @@
-<html>
+  <html>
 <head>
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3.1.6/dist/iife/webmidi.iife.min.js"></script>
   
@@ -93,6 +93,9 @@ WebMidi.enable(function(err) {
 
 function onMidiEvent(event, input) {
   var note = event.note.number;
+
+  console.log("Received MIDI note number:", note);
+
   
   // Get the active pitches
   var activePitches = Array.from(document.querySelectorAll('.pitch.active')).map(btn => btn.textContent);
