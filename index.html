@@ -20,8 +20,6 @@
 
 <label for="midi-input">MIDI Input:</label>
 <select id="midi-input"></select>
-
-  
   
 <button class="pitch" onclick="togglePitch(this)">C</button>
 <button class="pitch" onclick="togglePitch(this)">C#/Db</button>  
@@ -105,7 +103,6 @@ function findNearestPitch(note) {
   }
   return nearestPitch;
 }
-
 
 var output = WebMidi.outputs[0];  // Choose the first output device.
 
