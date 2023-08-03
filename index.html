@@ -37,30 +37,60 @@
 
   
 <script>
+
+
+  
 function togglePitch(btn) {
   btn.classList.toggle('active'); 
 }
 </script>
-
 </body>
 </html>
 
 <script>
-
 WebMidi.enable(function(err) {
   if (err) {
     console.log("WebMidi could not be enabled.", err);
     return;
   }
   
-  var input = WebMidi.inputs[0];  // Choose the first input device.
+  var select = document.getElementById("midi-input");
+
+  for (var i = 0; i < WebMidi.inputs.length; i++) {
+    var opt = document.createElement("option");
+    opt.value = i;
+    opt.text = WebMidi.inputs[i].name;
+    select.appendChild(opt);
+  }
+
+  select.addEventListener("change", function() {
+    var input = WebMidi.inputs[Number(select.value)];
+
+    input.removeListener('noteon', "all");
+
+    input.addListener('noteon', "all", function(e) {
+      onMidiEvent(e, input);
+    });
+  });
   
-  input.addListener('noteon', "all", onMidiEvent);
+  select.dispatchEvent(new Event("change"));
 });
 
+function onMidiEvent(event, input) {
+  var note = event.note.number;
+  var nearestPitch = findNearestPitch(note);
+  playMidiNote(nearestPitch, input);
+}
 
+// Rest of your code...
 
-const noteToMidi = {
+function playMidiNote(pitch, input) {
+  var output = WebMidi.outputs[0];  // Choose the first output device.
+  output.playNote(pitch, input.channel);  // Same channel as the input.
+}
+
+  
+  const noteToMidi = {
   "C": 60,
   "C#/Db": 61,
   "D": 62, 
@@ -74,19 +104,6 @@ const noteToMidi = {
   "A#/Bb": 70,
   "B": 71
 };
-function onMidiEvent(event) {
-  var select = document.getElementById("midi-input");
-  var input = WebMidi.inputs[select.value];
-  var note = event.note.number;
-  var nearestPitch = findNearestPitch(note);
-  playMidiNote(nearestPitch);
-}
-
-function onMidiEvent(event) {
-  var note = event.note.number;
-  var nearestPitch = findNearestPitch(note);
-  playMidiNote(nearestPitch);
-}
 
 
 function findNearestPitch(note) {
