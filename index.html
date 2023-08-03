@@ -97,6 +97,9 @@ function onMidiEvent(event, input) {
   // Get the active pitches
   var activePitches = Array.from(document.querySelectorAll('.pitch.active')).map(btn => btn.textContent);
   
+  // Log the active pitches to the console
+  console.log("Active pitches:", activePitches);
+  
   var nearestPitch = findNearestPitch(note, activePitches);
   
   var selectOutput = document.getElementById("midi-output");
@@ -104,6 +107,7 @@ function onMidiEvent(event, input) {
 
   playMidiNote(nearestPitch, input, output);
 }
+
 
 // Rest of your code...
 
