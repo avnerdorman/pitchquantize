@@ -108,8 +108,12 @@ function onMidiEvent(event, input) {
 // Rest of your code...
 
 function playMidiNote(pitch, input, output) {
-  output.playNote(pitch, input.channel);  // Same channel as the input.
+  var note = pitch.slice(0, -1);  // Note name (e.g., "C", "C#/Db", ...)
+  var octave = Number(pitch.slice(-1));  // Octave number
+  var midiNoteNumber = noteToMidi[note] + octave * 12;
+  output.playNote(midiNoteNumber, input.channel);  // Same channel as the input.
 }
+
 
 function onMidiEvent(event, input) {
   var note = event.note.number;
@@ -152,11 +156,12 @@ function findNearestPitch(note, activePitches) {
     var distance = Math.abs(note - midi);
     if (distance < nearestDistance) {
       nearestDistance = distance;
-      nearestPitch = midi;
+      nearestPitch = pitch + octave;
     }
   }
   return nearestPitch;
 }
+
 
 
 var output = WebMidi.outputs[0];  // Choose the first output device.
