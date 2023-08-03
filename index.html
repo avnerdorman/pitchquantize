@@ -1,0 +1,116 @@
+<html>
+<script src="https://cdn.jsdelivr.net/npm/webmidi"></script>
+
+<head>
+<style>
+.pitch {
+  padding: 10px 20px; 
+  background-color: #ddd;
+  border: none;
+  font-size: 16px;
+}
+
+.active {
+  background-color: black;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<label for="midi-input">MIDI Input:</label>
+<select id="midi-input"></select>
+
+  
+  
+<button class="pitch" onclick="togglePitch(this)">C</button>
+<button class="pitch" onclick="togglePitch(this)">C#/Db</button>  
+<button class="pitch" onclick="togglePitch(this)">D</button>
+<button class="pitch" onclick="togglePitch(this)">D#/Eb</button>
+<button class="pitch" onclick="togglePitch(this)">E</button>
+<button class="pitch" onclick="togglePitch(this)">F</button>
+<button class="pitch" onclick="togglePitch(this)">F#/Gb</button>
+<button class="pitch" onclick="togglePitch(this)">G</button>
+<button class="pitch" onclick="togglePitch(this)">G#/Ab</button>
+<button class="pitch" onclick="togglePitch(this)">A</button>
+<button class="pitch" onclick="togglePitch(this)">A#/Bb</button>
+<button class="pitch" onclick="togglePitch(this)">B</button>
+
+
+  
+<script>
+function togglePitch(btn) {
+  btn.classList.toggle('active'); 
+}
+</script>
+
+</body>
+</html>
+
+<script>
+
+WebMidi.enable(function(err) {
+  if (err) {
+    console.log("WebMidi could not be enabled.", err);
+    return;
+  }
+  
+  var input = WebMidi.inputs[0];  // Choose the first input device.
+  
+  input.addListener('noteon', "all", onMidiEvent);
+});
+
+
+
+const noteToMidi = {
+  "C": 60,
+  "C#/Db": 61,
+  "D": 62, 
+  "D#/Eb": 63,
+  "E": 64,
+  "F": 65,
+  "F#/Gb": 66,
+  "G": 67,
+  "G#/Ab": 68, 
+  "A": 69,
+  "A#/Bb": 70,
+  "B": 71
+};
+function onMidiEvent(event) {
+  var select = document.getElementById("midi-input");
+  var input = WebMidi.inputs[select.value];
+  var note = event.note.number;
+  var nearestPitch = findNearestPitch(note);
+  playMidiNote(nearestPitch);
+}
+
+function onMidiEvent(event) {
+  var note = event.note.number;
+  var nearestPitch = findNearestPitch(note);
+  playMidiNote(nearestPitch);
+}
+
+
+function findNearestPitch(note) {
+  var nearestPitch = null;
+  var nearestDistance = Infinity;
+  for (var i = 0; i < activePitches.length; i++) {
+    var pitch = activePitches[i];
+    var midi = noteToMidi[pitch];
+    var distance = Math.abs(note - midi);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestPitch = pitch;
+    }
+  }
+  return nearestPitch;
+}
+
+
+var output = WebMidi.outputs[0];  // Choose the first output device.
+
+function playMidiNote(pitch) {
+  output.playNote(pitch, 1);  // Channel 1.
+}
+
+</script>
